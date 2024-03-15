@@ -327,6 +327,38 @@ class Queue : public QueueBase
      */
     const Container& GetContainer() const;
 
+	/**
+	* \brief Get a const iterator which refers to the first item in the queue.
+	*
+	* Subclasses can browse the items in the queue by using an iterator
+	*
+	* \code
+	*   for (auto i = Head (); i != Tail (); ++i)
+	*     {
+	*       (*i)->method ();  // some method of the Item class
+	*     }
+	* \endcode
+	*
+	* \returns a const iterator which refers to the first item in the queue.
+	*/
+	// ConstIterator Head (void) const;
+	
+	/**
+	* \brief Get a const iterator which indicates past-the-last item in the queue.
+	*
+	* Subclasses can browse the items in the queue by using an iterator
+	*
+	* \code
+	*   for (auto i = Head (); i != Tail (); ++i)
+	*     {
+	*       (*i)->method ();  // some method of the Item class
+	*     }
+	* \endcode
+	*
+	* \returns a const iterator which indicates past-the-last item in the queue.
+	*/
+	// ConstIterator Tail (void) const;
+
     /**
      * Push an item in the queue
      * \param pos the position before which the item will be inserted
@@ -637,6 +669,18 @@ Queue<Item, Container>::DoPeek(ConstIterator pos) const
 
     return MakeGetItem<Container>::GetItem(m_packets, pos);
 }
+
+// template <typename Item, typename Container>
+// typename Queue<Item, Container>::ConstIterator Queue<Item, Container>::Head() const
+// {
+//     return m_packets.begin();
+// }
+
+// template <typename Item, typename Container>
+// typename Queue<Item, Container>::ConstIterator Queue<Item, Container>::Tail() const
+// {
+//     return m_packets.end();
+// }
 
 template <typename Item, typename Container>
 void

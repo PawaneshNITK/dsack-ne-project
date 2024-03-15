@@ -121,6 +121,10 @@ TcpSocketBase::GetTypeId()
                           BooleanValue(true),
                           MakeBooleanAccessor(&TcpSocketBase::m_timestampEnabled),
                           MakeBooleanChecker())
+            .AddAttribute ("Dsack", "Enable or disable DSACK option",
+      			  BooleanValue (false),
+           		  MakeBooleanAccessor (&TcpSocketBase::m_dsackEnabled),
+           		  MakeBooleanChecker ())
             .AddAttribute(
                 "MinRto",
                 "Minimum retransmit timeout value",
@@ -364,6 +368,7 @@ TcpSocketBase::TcpSocketBase(const TcpSocketBase& sock)
       m_sndWindShift(sock.m_sndWindShift),
       m_timestampEnabled(sock.m_timestampEnabled),
       m_timestampToEcho(sock.m_timestampToEcho),
+      m_dsackEnabled (sock.m_dsackEnabled),
       m_recover(sock.m_recover),
       m_recoverActive(sock.m_recoverActive),
       m_retxThresh(sock.m_retxThresh),
@@ -1296,6 +1301,16 @@ TcpSocketBase::IsValidTcpSegment(const SequenceNumber32 seq,
                                 << ":" << seq + tcpPayloadSize << ") out of range ["
                                 << m_tcb->m_rxBuffer->NextRxSequence() << ":"
                                 << m_tcb->m_rxBuffer->MaxRxSequence() << ")");
+                                
+        // Received a duplicate packet. Update parameters for DSACK
+      		if (m_dsackEnabled && (seq + tcpPayloadSize < m_tcb->m_rxBuffer->NextRxSequence () || m_tcb->m_rxBuffer->MaxRxSequence () <= seq))
+        {
+          m_isDsack = true;
+          m_dsackFirst = seq;
+          m_dsackSecond = seq + m_tcb->m_segmentSize;
+        }
+
+
         // Acknowledgement should be sent for all unacceptable packets (RFC793, p.69)
         SendEmptyPacket(TcpHeader::ACK);
         return false;
@@ -2825,6 +2840,10 @@ TcpSocketBase::SendEmptyPacket(uint8_t flags)
         {
             m_highTxAck = header.GetAckNumber();
         }
+        if (m_sackEnabled && m_dsackEnabled && m_isDsack)
+        {
+          AddDsack (header);
+        }
         if (m_sackEnabled && m_tcb->m_rxBuffer->GetSackListSize() > 0)
         {
             AddOptionSack(header);
@@ -4326,6 +4345,33 @@ TcpSocketBase::AddOptionSack(TcpHeader& header)
     header.AppendOption(option);
     NS_LOG_INFO(m_node->GetId() << " Add option SACK " << *option);
 }
+
+void
+TcpSocketBase::AddDsack (TcpHeader& header)
+{
+  NS_LOG_FUNCTION (this << header);
+
+  // Calculate the number of SACK blocks allowed in this packet
+  uint8_t optionLenAvail = header.GetMaxOptionLength () - header.GetOptionLength ();
+  uint8_t allowedSackBlocks = (optionLenAvail - 2) / 8;
+
+  if (m_dsackEnabled && m_isDsack)
+    {
+      Ptr<TcpOptionSack> option = CreateObject<TcpOptionSack> ();
+
+      // Add DSACK block
+      TcpOptionSack::SackBlock dsack_Block;
+      dsack_Block.first = m_dsackFirst;
+      dsack_Block.second = m_dsackSecond;
+      option->AddSackBlock (dsack_Block);
+      allowedSackBlocks--;
+      m_isDsack = false;
+
+      header.AppendOption (option);
+      NS_LOG_INFO (m_node->GetId () << " Add option DSACK " << *option);
+    }
+}
+
 
 void
 TcpSocketBase::ProcessOptionTimestamp(const Ptr<const TcpOption> option,

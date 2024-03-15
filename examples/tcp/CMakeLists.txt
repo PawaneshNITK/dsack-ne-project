@@ -112,3 +112,12 @@ build_example(
     ${libapplications}
     ${libtraffic-control}
 )
+
+build_example(
+  NAME dsack-example
+  SOURCE_FILES dsack-example.cc
+  LIBRARIES_TO_LINK
+    ${libpoint-to-point}
+    ${libinternet}
+    ${libapplications}
+)

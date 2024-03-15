@@ -785,7 +785,13 @@ TcpTxBuffer::Update(const TcpOptionSack::SackList& list, const Callback<void, Tc
     NS_LOG_INFO("Updating scoreboard, got " << list.size() << " blocks to analyze");
 
     uint32_t bytesSacked = 0;
+    
+    if (m_sentList.size () == 0)
+    {
+      return false;
+    }
 
+    
     for (auto option_it = list.begin(); option_it != list.end(); ++option_it)
     {
         auto item_it = m_sentList.begin();

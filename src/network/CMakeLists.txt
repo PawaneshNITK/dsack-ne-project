@@ -64,6 +64,7 @@ set(source_files
     utils/queue-limits.cc
     utils/queue-size.cc
     utils/queue.cc
+    # utils/reorder-queue.cc
     utils/radiotap-header.cc
     utils/simple-channel.cc
     utils/simple-net-device.cc
@@ -142,6 +143,7 @@ set(header_files
     utils/queue-limits.h
     utils/queue-size.h
     utils/queue.h
+    # utils/reorder-queue.h
     utils/radiotap-header.h
     utils/sequence-number.h
     utils/simple-channel.h

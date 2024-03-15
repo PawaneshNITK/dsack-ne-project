@@ -321,6 +321,7 @@ set(test_sources
     test/tcp-rtt-estimation.cc
     test/tcp-rx-buffer-test.cc
     test/tcp-sack-permitted-test.cc
+    test/tcp-dsack-test.cc
     test/tcp-scalable-test.cc
     test/tcp-slow-start-test.cc
     test/tcp-syn-connection-failed-test.cc
