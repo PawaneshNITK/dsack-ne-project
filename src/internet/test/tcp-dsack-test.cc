@@ -92,7 +92,7 @@ public:
   TcpDsackTestSuite () : TestSuite ("tcp-dsack-test", UNIT)
   {
     AddTestCase (new TcpDsackSackTest (true, true, "Sack enable"), TestCase::QUICK);
-    AddTestCase (new TcpDsackSackTest (false, true, "Sack disable"), TestCase::QUICK);
+    AddTestCase (new TcpDsackSackTest (true, true, "Sack disable"), TestCase::QUICK);
   }
 };
 
