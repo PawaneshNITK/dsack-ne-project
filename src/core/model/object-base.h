@@ -146,6 +146,19 @@ template <typename T>
 std::string DoGetTemplateClassName();
 
 /**
+ * \brief Helper function to get the name (as a string) of the type parameter
+ *        of a template class
+ * \return the name of the type parameter as a string
+ */
+template <typename T>
+std::string GetTypeParamName (void)
+{
+  return DoGetTemplateClassName<T> ();
+}
+
+class AttributeConstructionList;
+
+/**
  * \brief Helper function to get the name (as a string) of the type
  *        of a template class
  * \return the name of the type of a template class as a string
